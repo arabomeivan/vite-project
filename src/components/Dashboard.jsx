@@ -5,10 +5,8 @@ import { useState } from "react";
 import { SlOptionsVertical } from "react-icons/sl";
 
 const Dashboard = () => {
-  // Get the current date
   const today = new Date();
 
-  // Options for formatting the date
   const options = {
     weekday: "long",
     year: "numeric",
@@ -16,11 +14,11 @@ const Dashboard = () => {
     day: "numeric",
   };
 
-  // Format the date
   const formattedDate = today.toLocaleDateString("en-US", options);
 
   const [tasks, setTasks] = useState([]);
   const [inputValue, setInputValue] = useState("");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(null);
 
   const addTask = (startDate, endDate) => {
     if (inputValue.trim()) {
@@ -46,6 +44,17 @@ const Dashboard = () => {
   const removeTask = (index) => {
     const newTasks = tasks.filter((_, i) => i !== index);
     setTasks(newTasks);
+  };
+
+  const handleEditTask = (index) => {
+    const taskToEdit = tasks[index];
+    setInputValue(taskToEdit.text);
+    removeTask(index);
+    setIsDropdownOpen(null);
+  };
+
+  const toggleDropdown = (index) => {
+    setIsDropdownOpen(isDropdownOpen === index ? null : index);
   };
 
   return (
@@ -85,11 +94,10 @@ const Dashboard = () => {
                 ></button>
                 <h4>{task.text}</h4>
               </div>
-              <div className="flex items-center space-x-1">
+              <div className="flex items-center space-x-1 relative">
                 {/* time */}
                 <div className="bg-gray-100 p-2 rounded-lg flex items-center space-x-1">
                   <div>
-                    {" "}
                     <CiClock2 />
                   </div>
                   <p>
@@ -98,11 +106,27 @@ const Dashboard = () => {
                 </div>
                 {/* option menu */}
                 <div
-                  onClick={() => removeTask(index)}
-                  className="p-3 bg-gray-100 rounded-lg"
+                  onClick={() => toggleDropdown(index)}
+                  className="p-3 bg-gray-100 rounded-lg cursor-pointer"
                 >
                   <SlOptionsVertical size={14} />
                 </div>
+                {isDropdownOpen === index && (
+                  <div className="absolute right-0 top-8 bg-white shadow-md rounded-md w-32 z-10">
+                    <div
+                      onClick={() => handleEditTask(index)}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    >
+                      Edit
+                    </div>
+                    <div
+                      onClick={() => removeTask(index)}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    >
+                      Delete
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

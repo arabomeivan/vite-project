@@ -3,6 +3,7 @@ import { LuClipboardList } from "react-icons/lu";
 import { SlCalender } from "react-icons/sl";
 import Calendar from "./Calendar";
 
+// eslint-disable-next-line react/prop-types
 const AddTask = ({ onAddTask, inputValue, setInputValue }) => {
   // State to toggle visibility of the task input section
   const [isVisible, setIsVisible] = useState(false);
@@ -70,16 +71,19 @@ const AddTask = ({ onAddTask, inputValue, setInputValue }) => {
           )}
 
           {/* Priority Section with onAddTask */}
-          <div
-            onClick={() => onAddTask(startDate, endDate)}
-            className="flex flex-row justify-between items-center bg-gray-100 px-3 py-2 rounded-3xl cursor-pointer"
-          >
+          <div className="flex flex-row justify-between items-center bg-gray-100 px-3 py-2 rounded-3xl cursor-pointer">
             <div className="flex space-x-2">
               <div>➕</div>
               <div>Add to priority</div>
             </div>
             <div>5</div>
           </div>
+          <button
+            onClick={() => onAddTask(startDate, endDate)}
+            className="px-4 py-2 rounded-3xl bg-black text-white"
+          >
+            Save
+          </button>
         </div>
       )}
       {/* Toggle visibility of the task input section */}
