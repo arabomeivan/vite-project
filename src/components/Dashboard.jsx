@@ -9,7 +9,7 @@ import {
   toggleTaskCompletion,
   removeTask,
   editTask,
-} from "./taskSlice";
+} from "../features/tasks/taskSlice";
 
 const Dashboard = () => {
   const today = new Date();
