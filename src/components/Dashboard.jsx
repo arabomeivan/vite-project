@@ -22,11 +22,16 @@ const Dashboard = () => {
   const [tasks, setTasks] = useState([]);
   const [inputValue, setInputValue] = useState("");
 
-  const addTask = () => {
+  const addTask = (startDate, endDate) => {
     if (inputValue.trim()) {
       setTasks([
         ...tasks,
-        { text: inputValue, completed: false, time: "08:00 - 09:00" },
+        {
+          text: inputValue,
+          completed: false,
+          startDate: startDate.toLocaleDateString(),
+          endDate: endDate.toLocaleDateString(),
+        },
       ]);
       setInputValue("");
     }
@@ -87,7 +92,9 @@ const Dashboard = () => {
                     {" "}
                     <CiClock2 />
                   </div>
-                  <p>{task.time}</p>
+                  <p>
+                    {task.startDate} - {task.endDate}
+                  </p>
                 </div>
                 {/* option menu */}
                 <div

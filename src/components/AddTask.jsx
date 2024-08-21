@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { LuClipboardList } from "react-icons/lu";
 import { SlCalender } from "react-icons/sl";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import Calendar from "./Calendar";
 
 const AddTask = ({ onAddTask, inputValue, setInputValue }) => {
   // State to toggle visibility of the task input section
   const [isVisible, setIsVisible] = useState(false);
   const [startDate, setStartDate] = useState(new Date()); // State to manage date
+  const [endDate, setEndDate] = useState(new Date());
   const [view, setView] = useState("notes"); // State to manage current view
 
   // Toggle function to show/hide the task input section
@@ -66,25 +66,12 @@ const AddTask = ({ onAddTask, inputValue, setInputValue }) => {
               />
             </div>
           ) : (
-            <div>
-              <div>
-                {/* Calendar view content */}
-                <p>Calendar view coming soon!</p>
-                <DatePicker
-                  selected={startDate}
-                  onChange={(date) => setStartDate(date)}
-                  showTimeSelect
-                  dateFormat="Pp"
-                  className="border rounded-md p-2 w-full bg-gray-100"
-                />
-                {/* Add calendar component or content here */}
-              </div>
-            </div>
+            <Calendar setStartDate={setStartDate} setEndDate={setEndDate} />
           )}
 
           {/* Priority Section with onAddTask */}
           <div
-            onClick={onAddTask}
+            onClick={() => onAddTask(startDate, endDate)}
             className="flex flex-row justify-between items-center bg-gray-100 px-3 py-2 rounded-3xl cursor-pointer"
           >
             <div className="flex space-x-2">
