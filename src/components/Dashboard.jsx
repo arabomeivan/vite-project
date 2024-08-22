@@ -1,14 +1,19 @@
 import { CiClock2 } from "react-icons/ci";
 import AddTask from "./AddTask";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
+import { useSelector, useDispatch } from "react-redux";
 import { useState } from "react";
 import { SlOptionsVertical } from "react-icons/sl";
+import {
+  addTask,
+  toggleTaskCompletion,
+  removeTask,
+  editTask,
+} from "../features/tasks/taskSlice";
 
 const Dashboard = () => {
-  // Get the current date
   const today = new Date();
 
-  // Options for formatting the date
   const options = {
     weekday: "long",
     year: "numeric",
@@ -16,31 +21,46 @@ const Dashboard = () => {
     day: "numeric",
   };
 
-  // Format the date
   const formattedDate = today.toLocaleDateString("en-US", options);
 
-  const [tasks, setTasks] = useState([]);
-  const [inputValue, setInputValue] = useState("");
+  const tasks = useSelector((state) => state.tasks);
+  const dispatch = useDispatch();
 
-  const addTask = () => {
+  const [inputValue, setInputValue] = useState("");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(null);
+  const [editingIndex, setEditingIndex] = useState(null);
+
+  const handleAddTask = (startDate, endDate) => {
     if (inputValue.trim()) {
-      setTasks([
-        ...tasks,
-        { text: inputValue, completed: false, time: "08:00 - 09:00" },
-      ]);
+      dispatch(
+        addTask({
+          text: inputValue,
+          completed: false,
+          startDate: startDate.toLocaleDateString(),
+          endDate: endDate.toLocaleDateString(),
+        })
+      );
       setInputValue("");
     }
   };
 
-  const toggleTaskCompletion = (index) => {
-    const newTasks = [...tasks];
-    newTasks[index].completed = !newTasks[index].completed;
-    setTasks(newTasks);
+  const handleEditTask = (index) => {
+    setInputValue(tasks[index].text);
+    setEditingIndex(index);
+    setIsDropdownOpen(null);
   };
 
-  const removeTask = (index) => {
-    const newTasks = tasks.filter((_, i) => i !== index);
-    setTasks(newTasks);
+  const handleSaveEdit = () => {
+    if (editingIndex !== null) {
+      dispatch(
+        editTask({
+          index: editingIndex,
+          updatedTask: { text: inputValue },
+        })
+      );
+      setEditingIndex(null);
+      setInputValue("");
+    }
   };
 
   return (
@@ -75,27 +95,46 @@ const Dashboard = () => {
             <div className="flex items-center justify-between">
               <div className="flex space-x-2 items-center">
                 <button
-                  onClick={() => toggleTaskCompletion(index)}
+                  onClick={() => dispatch(toggleTaskCompletion(index))}
                   className="border border-gray-300 w-5 h-5 rounded-md"
                 ></button>
                 <h4>{task.text}</h4>
               </div>
-              <div className="flex items-center space-x-1">
+              <div className="flex items-center space-x-1 relative">
                 {/* time */}
                 <div className="bg-gray-100 p-2 rounded-lg flex items-center space-x-1">
                   <div>
-                    {" "}
                     <CiClock2 />
                   </div>
-                  <p>{task.time}</p>
+                  <p>
+                    {task.startDate} - {task.endDate}
+                  </p>
                 </div>
                 {/* option menu */}
                 <div
-                  onClick={() => removeTask(index)}
-                  className="p-3 bg-gray-100 rounded-lg"
+                  onClick={() =>
+                    setIsDropdownOpen(isDropdownOpen === index ? null : index)
+                  }
+                  className="p-3 bg-gray-100 rounded-lg cursor-pointer"
                 >
                   <SlOptionsVertical size={14} />
                 </div>
+                {isDropdownOpen === index && (
+                  <div className="absolute right-0 top-8 bg-white shadow-md rounded-md w-32 z-10">
+                    <div
+                      onClick={() => handleEditTask(index)}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    >
+                      Edit
+                    </div>
+                    <div
+                      onClick={() => dispatch(removeTask(index))}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    >
+                      Delete
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -105,9 +144,11 @@ const Dashboard = () => {
       <div className="absolute bottom-10 left-12 right-0">
         {/* Add new task */}
         <AddTask
-          onAddTask={addTask}
+          onAddTask={handleAddTask}
           inputValue={inputValue}
           setInputValue={setInputValue}
+          onSaveEdit={handleSaveEdit}
+          isEditing={editingIndex !== null}
         />
       </div>
     </div>
